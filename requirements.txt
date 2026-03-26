@@ -1,0 +1,75 @@
+# Core scientific computing
+numpy
+scipy
+pandas
+
+# Machine learning
+scikit-learn
+
+# Deep learning
+torch
+torchvision
+torchaudio
+
+# Graph neural networks
+torch-geometric
+
+# Reinforcement learning
+stable-baselines3
+gymnasium
+
+# Orbital mechanics and propagation
+sgp4
+poliastro
+astropy
+skyfield
+
+# Data handling and utilities
+tqdm
+joblib
+pyyaml
+
+# Visualization
+matplotlib
+seaborn
+plotly
+
+# Notebooks
+jupyter
+notebook
+ipykernel
+
+# Experiment tracking
+tensorboard
+wandb
+
+# File and configuration management
+python-dotenv
+hydra-core
+
+# Logging
+loguru
+
+# Development utilities
+black
+flake8
+pytest
+
+## others but nessesary
+
+tqdm
+pandas
+
+torch
+torch_geometric
+numpy
+scipy
+sgp4
+poliastro
+astropy
+opencv-python
+ultralytics
+stable-baselines3
+gymnasium
+networkx
+pandas

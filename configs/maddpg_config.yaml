@@ -1,0 +1,59 @@
+# MADDPG Configuration for Multi-Agent Collision Avoidance
+
+# Environment Settings
+environment:
+  name: "OrbitalCollisionEnv"
+  num_agents: 5                    # Number of satellites (increased from 3)
+  num_objects: 8                   # Total debris/objects in scene (increased)
+  safe_distance: 20.0              # Safe separation (meters)
+  collision_distance: 2.0          # Collision threshold (meters)
+  max_steps: 300                   # Max steps per episode
+  dt: 1.0                          # Time step (seconds)
+  max_delta_v: 0.3                 # Max velocity change
+  world_size: 200                  # Simulation world size
+
+# Network Architecture
+model_type: "transformer"   # options: standard, lightweight, transformer
+actor_network:
+  state_dim: 52                    # Input: [x, y, vx, vy] * (5 agents + 8 objects)
+  action_dim: 2                    # Output: [delta_vx, delta_vy]
+  hidden_dim: 256
+  layers: 3
+  activation: "relu"
+  output_activation: "tanh"
+
+critic_network:
+  hidden_dim: 256
+  layers: 3
+  activation: "relu"
+
+# Training Parameters
+training:
+  max_episodes: 5000
+  batch_size: 128
+  learning_rate_actor: 0.001
+  learning_rate_critic: 0.001
+  gamma: 0.99                      # Discount factor
+  tau: 0.01                        # Soft update coefficient
+  buffer_size: 100000              # Replay buffer size
+  warmup_episodes: 100             # Episodes before training starts
+  metrics_dir: "results/metrics"
+  tensorboard_log_dir: "runs/maddpg"
+  
+# Exploration
+exploration:
+  initial_noise_scale: 0.2
+  final_noise_scale: 0.01
+  noise_decay_episodes: 2500
+  
+# Checkpointing
+checkpointing:
+  save_interval: 500
+  checkpoint_dir: "results/saved_models"
+  keep_best: true
+  
+# Logging
+logging:
+  log_interval: 10
+  metrics_dir: "results/metrics"
+  tensorboard_log_dir: "runs/maddpg"

@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments
+.env
+.venv
+conda-meta/
+
+# Data
+data/raw/
+data/processed/
+data/synthetic/
+
+# Logs
+logs/
+*.log
+
+# Models
+*.pth
+*.pt
+*.npy
+
+# Results
+results/
+runs/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db

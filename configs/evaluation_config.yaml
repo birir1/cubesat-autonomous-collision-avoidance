@@ -1,0 +1,55 @@
+# Evaluation Configuration
+
+evaluation:
+  # Test scenarios
+  num_test_episodes: 100
+  render: false
+  save_trajectories: true
+  
+  # Metrics to compute
+  metrics:
+    - collision_rate              # % of collisions
+    - successful_avoidance_rate   # % of safe episodes
+    - average_fuel_cost           # Total delta-v per episode
+    - min_distance_achieved       # Closest approach to obstacles
+    - episode_length              # Avg steps taken
+    - reward_per_episode          # Cumulative reward
+    
+  # Comparison settings
+  comparison:
+    models_to_compare:
+      - "ppo_cubesat_final.pth"
+      - "maddpg_cubesat_final.pth"
+    save_comparison_plots: true
+    output_dir: "results/reports"
+    
+  # Thresholds for safety
+  safety_thresholds:
+    safe_distance_margin: 20.0    # meters
+    collision_distance: 2.0       # meters
+    acceptable_avoidance_rate: 0.95  # 95% success
+
+# Benchmark Configuration
+benchmark:
+  scenarios:
+    - name: "head_on_approach"
+      description: "Single debris approaching CubeSat"
+      
+    - name: "multi_agent_dense"
+      description: "3+ satellites in congested orbit"
+      
+    - name: "debris_field"
+      description: "CubeSat navigating debris cloud"
+      
+    - name: "coordinated_evasion"
+      description: "Multiple CubeSats coordinating maneuvers"
+  
+  dataset_path: "data/processed/test_scenarios/"
+
+# Visualization
+visualization:
+  plot_trajectories: true
+  plot_policy_heatmaps: true
+  plot_training_curves: true
+  save_videos: false
+  output_dir: "results/figures"

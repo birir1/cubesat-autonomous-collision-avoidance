@@ -13,7 +13,7 @@ import numpy as np
 
 from utils.tle_loader import load_all_satellites
 from data.features.collision_labels import build_real_dataset
-from models.collision_risk_model import CollisionRiskModel
+from models.static_collision_risk_model import StaticCollisionRiskModel
 
 
 def normalize(X):
@@ -87,7 +87,7 @@ def train_real():
     # -----------------------------
     # 5. Model
     # -----------------------------
-    model = CollisionRiskModel()
+    model = StaticCollisionRiskModel()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     criterion = torch.nn.MSELoss()

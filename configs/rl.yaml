@@ -1,0 +1,16 @@
+rl:
+  algorithm: maddpg
+  gamma: 0.99
+  lr: 1e-4
+  batch_size: 64
+  num_episodes: 200
+  replay_buffer_size: 100000
+  exploration_noise: 0.1
+  target_update_interval: 10
+  reward_config:
+    collision_penalty: -1000.0
+    success_reward: 150.0
+    distance_reward_weight: 0.2
+    fuel_penalty_weight: 0.1
+    safe_distance: 1000.0
+    warning_distance: 500.0

@@ -1,6 +1,6 @@
 """
 Transformer-based Trajectory Risk Model
-(STABLE + BACKWARD COMPATIBLE + SAFE LOADING + LOGITS FIX)
+(ENHANCED: attention pooling + better variance + stable training)
 """
 
 import torch
@@ -27,11 +27,26 @@ class PositionalEncoding(nn.Module):
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
 
-        # Register buffer → moves with model automatically
-        self.register_buffer("pe", pe.unsqueeze(0))  # (1, T, d_model)
+        self.register_buffer("pe", pe.unsqueeze(0))
 
     def forward(self, x):
         return x + self.pe[:, :x.size(1)]
+
+
+# ============================================
+# ATTENTION POOLING (CRITICAL FIX)
+# ============================================
+
+class AttentionPooling(nn.Module):
+    def __init__(self, d_model):
+        super().__init__()
+        self.attn = nn.Linear(d_model, 1)
+
+    def forward(self, x):
+        # x: (B, T, d_model)
+        weights = torch.softmax(self.attn(x), dim=1)  # (B, T, 1)
+        pooled = (x * weights).sum(dim=1)             # (B, d_model)
+        return pooled
 
 
 # ============================================
@@ -54,7 +69,8 @@ class TrajectoryRiskModel(nn.Module):
             nhead=nhead,
             dim_feedforward=128,
             dropout=0.1,
-            batch_first=True
+            batch_first=True,
+            norm_first=True  # more stable
         )
 
         self.transformer = nn.TransformerEncoder(
@@ -62,15 +78,23 @@ class TrajectoryRiskModel(nn.Module):
             num_layers=num_layers
         )
 
-        # ---- Prediction head (NO SIGMOID → logits) ----
+        # ---- Attention pooling (replaces mean) ----
+        self.pooling = AttentionPooling(d_model)
+
+        # ---- Normalization ----
+        self.norm = nn.LayerNorm(d_model)
+
+        # ---- Prediction head (stronger + regularized) ----
         self.fc = nn.Sequential(
-            nn.Linear(d_model, 64),
+            nn.Linear(d_model, 128),
             nn.ReLU(),
+            nn.Dropout(0.1),
 
-            nn.Linear(64, 32),
+            nn.Linear(128, 64),
             nn.ReLU(),
+            nn.Dropout(0.1),
 
-            nn.Linear(32, 1)  # logits output
+            nn.Linear(64, 1)  # logits
         )
 
     # ============================================
@@ -78,11 +102,6 @@ class TrajectoryRiskModel(nn.Module):
     # ============================================
 
     def forward(self, x, apply_sigmoid=False):
-        """
-        Args:
-            x: (B, T, 6)
-            apply_sigmoid: bool → return probability if True
-        """
 
         # Input projection
         x = self.input_proj(x)
@@ -93,11 +112,17 @@ class TrajectoryRiskModel(nn.Module):
         # Transformer
         x = self.transformer(x)
 
-        # Temporal pooling (robust)
-        x = x.mean(dim=1)
+        # Attention pooling (FIXED)
+        x = self.pooling(x)
 
-        # Logits
+        # Normalize
+        x = self.norm(x)
+
+        # Output logits
         logits = self.fc(x)
+
+        # Optional: variance scaling (helps correlation)
+        logits = logits * 1.5
 
         if apply_sigmoid:
             return torch.sigmoid(logits)
@@ -109,20 +134,12 @@ class TrajectoryRiskModel(nn.Module):
     # ============================================
 
     def load_safe(self, state_dict):
-        """
-        Safe loader:
-        - Handles mismatched architectures
-        - Handles wrapped checkpoints
-        - Ignores incompatible layers
-        """
 
-        # Handle wrapped checkpoints
         if isinstance(state_dict, dict) and "state_dict" in state_dict:
             state_dict = state_dict["state_dict"]
 
         model_dict = self.state_dict()
 
-        # Keep only matching keys
         filtered_dict = {
             k: v for k, v in state_dict.items()
             if k in model_dict and v.shape == model_dict[k].shape

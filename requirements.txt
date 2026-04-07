@@ -73,3 +73,10 @@ stable-baselines3
 gymnasium
 networkx
 pandas
+
+
+scipy
+
+xgboost
+filterpy
+poliastro

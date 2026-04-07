@@ -1,0 +1,10 @@
+dataset:
+  data_dir: data/synthetic
+  sequence_length: 20
+  num_satellites: 10
+  num_samples: 2000
+  train_fraction: 0.7
+  val_fraction: 0.15
+  test_fraction: 0.15
+  image_size: 128
+  num_classes: 1

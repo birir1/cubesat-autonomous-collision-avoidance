@@ -1,0 +1,33 @@
+batch_size: 32
+checkpoint_dir: results/checkpoints
+data_dir: data/synthetic
+dropout: 0.2
+fusion_dim: 128
+gnn_config:
+  dropout: 0.1
+  edge_dim: 3
+  gnn_type: gcn
+  hidden_dim: 64
+  node_dim: 6
+  num_layers: 2
+  output_dim: 32
+learning_rate: 0.001
+num_epochs: 3
+num_samples: 2000
+num_satellites: 10
+num_workers: 2
+patience: 10
+seed: 42
+sequence_length: 20
+trajectory_config:
+  d_model: 128
+  dim_feedforward: 256
+  dropout: 0.2
+  input_dim: 6
+  nhead: 4
+  num_layers: 2
+use_wandb: false
+vision_config:
+  feature_dim: 512
+  num_classes: 1
+  pretrained: true

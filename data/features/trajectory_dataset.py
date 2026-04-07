@@ -1,12 +1,12 @@
 """
-Trajectory Dataset Builder (FIXED - HYBRID REAL + SYNTHETIC)
+Trajectory Dataset Builder (RESEARCH-GRADE VERSION)
 
-Key Fixes:
-- Injects REAL close encounters (critical)
-- Fixes zero high-risk issue
-- Adds velocity-aware risk
-- Stable normalization
-- Guaranteed dataset quality
+Upgrades:
+- Longer temporal window (better for Transformers)
+- Temporal-aware risk computation
+- Balanced synthetic vs real sampling
+- Hard sample emphasis
+- Improved realism (noise injection)
 """
 
 import numpy as np
@@ -18,6 +18,7 @@ import random
 # ============================================
 # NORMALIZATION
 # ============================================
+
 def normalize_trajectory(traj):
     mean = np.mean(traj, axis=0, keepdims=True)
     std = np.std(traj, axis=0, keepdims=True) + 1e-8
@@ -25,30 +26,42 @@ def normalize_trajectory(traj):
 
 
 # ============================================
-# RISK FUNCTION (IMPROVED)
+# RISK FUNCTION (TEMPORAL-AWARE FIX)
 # ============================================
-def compute_risk(distance, rel_speed):
-    d = max(distance, 1e-3)
-    risk_d = np.exp(-d / 20.0)
-    risk_v = min(rel_speed / 10.0, 1.0)
-    risk = 0.8 * risk_d + 0.2 * risk_v
+
+def compute_temporal_risk(distances, rel_speeds):
+    """
+    Uses full trajectory instead of single point
+    """
+
+    min_dist = np.min(distances)
+    mean_dist = np.mean(distances)
+
+    mean_speed = np.mean(rel_speeds)
+
+    risk_d = np.exp(-min_dist / 20.0)
+    risk_d_avg = np.exp(-mean_dist / 50.0)
+
+    risk_v = min(mean_speed / 10.0, 1.0)
+
+    risk = 0.6 * risk_d + 0.2 * risk_d_avg + 0.2 * risk_v
+
     return float(np.clip(risk, 0.0, 1.0))
 
 
 # ============================================
-# SYNTHETIC CLOSE ENCOUNTER (CRITICAL FIX)
+# SYNTHETIC CLOSE ENCOUNTER
 # ============================================
+
 def inject_close_encounter(pos1, vel1):
-    """
-    Force a realistic close encounter around sat1
-    """
+
     distance = np.random.choice(
         [
-            np.random.uniform(0.1, 2.0),    # HIGH RISK
-            np.random.uniform(2.0, 10.0),   # MEDIUM
-            np.random.uniform(10.0, 50.0),  # LOW
+            np.random.uniform(0.1, 2.0),
+            np.random.uniform(2.0, 10.0),
+            np.random.uniform(10.0, 50.0),
         ],
-        p=[0.4, 0.4, 0.2]
+        p=[0.3, 0.4, 0.3]  # less bias toward extreme
     )
 
     direction = np.random.normal(size=3)
@@ -56,7 +69,7 @@ def inject_close_encounter(pos1, vel1):
 
     pos2 = pos1 + direction * distance
 
-    rel_vel = np.random.normal(0, 1.5, size=3)
+    rel_vel = np.random.normal(0, 1.0, size=3)
     vel2 = vel1 + rel_vel
 
     return pos2, vel2
@@ -65,10 +78,11 @@ def inject_close_encounter(pos1, vel1):
 # ============================================
 # MAIN BUILDER
 # ============================================
+
 def build_trajectory_dataset(
     sats,
     num_samples=5000,
-    time_steps=5,
+    time_steps=20,        # 🔥 CRITICAL UPGRADE
     step_minutes=5
 ):
 
@@ -81,9 +95,7 @@ def build_trajectory_dataset(
     n_sats = len(valid_sats)
     print(f"Valid satellites: {n_sats}")
 
-    high_risk_count = 0
-    medium_risk_count = 0
-    low_risk_count = 0
+    counts = {"high": 0, "medium": 0, "low": 0}
 
     i = 0
     attempts = 0
@@ -91,19 +103,23 @@ def build_trajectory_dataset(
 
     while i < num_samples and attempts < max_attempts:
         attempts += 1
+
         try:
             sat1 = random.choice(valid_sats)
             t0 = ts.now()
             trajectory = []
 
+            use_synthetic = random.random() < 0.5  # 🔥 better balance
+
             for step in range(time_steps):
+
                 t = ts.utc(t0.utc_datetime() + timedelta(minutes=step * step_minutes))
                 s1 = sat1.at(t)
 
                 pos1 = np.array(s1.position.km)
                 vel1 = np.array(s1.velocity.km_per_s)
 
-                if random.random() < 0.7:
+                if use_synthetic:
                     pos2, vel2 = inject_close_encounter(pos1, vel1)
                 else:
                     sat2 = random.choice(valid_sats)
@@ -113,13 +129,18 @@ def build_trajectory_dataset(
 
                 rel_pos = pos1 - pos2
                 rel_vel = vel1 - vel2
+
                 rel = np.concatenate([rel_pos, rel_vel])
 
                 if not np.all(np.isfinite(rel)):
                     trajectory = None
                     break
 
+                # realism noise
+                rel += np.random.normal(0, 0.01, size=6)
+
                 rel = np.clip(rel, -1e4, 1e4)
+
                 trajectory.append(rel)
 
             if trajectory is None:
@@ -130,25 +151,33 @@ def build_trajectory_dataset(
             distances = np.linalg.norm(trajectory[:, :3], axis=1)
             rel_speeds = np.linalg.norm(trajectory[:, 3:], axis=1)
 
-            min_dist = np.min(distances)
-            avg_speed = np.mean(rel_speeds)
-            risk = compute_risk(min_dist, avg_speed)
+            risk = compute_temporal_risk(distances, rel_speeds)
 
-            # ---- Balance dataset ----
+            # ============================================
+            # BALANCING (IMPROVED)
+            # ============================================
+
             if risk > 0.5:
-                high_risk_count += 1
+                counts["high"] += 1
                 keep = True
+
             elif risk > 0.2:
-                medium_risk_count += 1
+                counts["medium"] += 1
                 keep = True
+
             else:
-                low_risk_count += 1
-                keep = random.random() < 0.3
+                counts["low"] += 1
+                keep = random.random() < 0.4
+
+            # 🔥 HARD SAMPLE BOOST
+            if 0.2 < risk < 0.5:
+                keep = True
 
             if not keep:
                 continue
 
             trajectory = normalize_trajectory(trajectory)
+
             if not np.all(np.isfinite(trajectory)):
                 continue
 
@@ -166,6 +195,7 @@ def build_trajectory_dataset(
     y = np.array(y, dtype=np.float32)
 
     print(f"\nFinal dataset: {X.shape}")
+
     if len(y) > 0:
         print(
             f"Risk distribution → min: {y.min():.4f}, "
@@ -173,12 +203,9 @@ def build_trajectory_dataset(
         )
 
     print("\nSampling stats:")
-    print(f"High-risk samples:   {high_risk_count}")
-    print(f"Medium-risk samples: {medium_risk_count}")
-    print(f"Low-risk samples:    {low_risk_count}")
+    print(counts)
 
-    if high_risk_count < 100:
-        print("\n⚠️ WARNING: Too few high-risk samples! "
-              "Increase injection probability or reduce distance")
+    if counts["high"] < 100:
+        print("\n WARNING: Too few high-risk samples!")
 
     return X, y

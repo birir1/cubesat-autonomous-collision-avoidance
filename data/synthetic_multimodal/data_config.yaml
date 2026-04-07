@@ -1,0 +1,13 @@
+augmentation:
+  brightness_range:
+  - 0.8
+  - 1.2
+  noise_factor: 0.01
+  rotation_range: 10
+communication_range: 500.0
+feature_scaler: standard
+image_size: !!python/tuple
+- 224
+- 224
+num_satellites: 10
+sequence_length: 20

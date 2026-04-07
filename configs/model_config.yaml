@@ -1,1 +1,29 @@
 # model_config.yaml
+model:
+  type: "transformer"   # options: mlp, lstm, transformer
+
+  input_dim: 6
+  output_dim: 1
+
+  transformer:
+    d_model: 128
+    nhead: 4
+    num_layers: 3
+    dim_feedforward: 256
+    dropout: 0.1
+
+  mlp:
+    hidden_dims: [128, 64, 32]
+    activation: "relu"
+    dropout: 0.2
+
+  lstm:
+    hidden_size: 128
+    num_layers: 2
+    dropout: 0.2
+
+  output:
+    activation: "sigmoid"
+
+  initialization:
+    method: "xavier"

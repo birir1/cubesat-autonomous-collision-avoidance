@@ -1,0 +1,80 @@
+# Data Pipeline Configuration for CubeSat Collision Avoidance
+# Defines parameters for multimodal data processing and feature engineering
+
+# Orbital parameters
+orbit:
+  type: LEO
+  altitude_range_km: [500, 1200]
+  inclination_range_deg: [95, 105]
+  eccentricity_max: 0.01
+
+# Communication and sensing
+communication:
+  range_km: 100
+  max_neighbors: 10
+
+# Risk assessment thresholds
+risk:
+  collision_threshold_m: 1000
+  warning_threshold_m: 5000
+  high_risk_threshold_m: 10000
+
+# Graph construction
+graph:
+  max_neighbors: 10
+  distance_threshold_km: 100
+  edge_features: ['distance', 'relative_velocity', 'angle']
+
+# Trajectory generation
+trajectory:
+  sequence_length: 20
+  time_step_minutes: 5
+  prediction_horizon_hours: 24
+
+# Vision processing
+vision:
+  target_size: [224, 224]
+  normalize_mean: [0.485, 0.456, 0.406]
+  normalize_std: [0.229, 0.224, 0.225]
+  confidence_threshold: 0.5
+  iou_threshold: 0.5
+  image_size: [224, 224]
+  backbone: resnet50
+  num_classes: 1
+
+# Fusion parameters
+fusion:
+  sequence_length: 10
+  prediction_horizon: 1
+  num_workers: 4
+  pin_memory: true
+
+# Dataset parameters
+dataset:
+  batch_size: 32
+  shuffle: true
+  num_workers: 4
+  pin_memory: true
+
+# Feature engineering
+features:
+  normalize: true
+  feature_names:
+    - relative_position_x
+    - relative_position_y
+    - relative_position_z
+    - relative_velocity_x
+    - relative_velocity_y
+    - relative_velocity_z
+    - distance
+    - time_to_closest_approach
+    - miss_distance
+    - neighbor_density
+
+# Validation
+validation:
+  check_nans: true
+  check_ranges: true
+  max_distance_km: 50000
+  min_distance_km: 0.1
+  max_velocity_kms: 10.0

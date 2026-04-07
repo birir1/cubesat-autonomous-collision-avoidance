@@ -1,0 +1,9 @@
+experiment:
+  name: trajectory_prediction
+  description: Evaluate trajectory-only prediction models for collision risk.
+  dataset: dataset.yaml
+  model: model.yaml
+  training:
+    epochs: 20
+    batch_size: 32
+    learning_rate: 0.001

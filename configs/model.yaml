@@ -1,0 +1,24 @@
+trajectory:
+  input_dim: 6
+  hidden_dim: 128
+  num_layers: 3
+  dropout: 0.2
+
+gnn:
+  node_dim: 32
+  edge_dim: 16
+  hidden_dim: 64
+  num_message_passing_steps: 3
+
+vision:
+  image_size: 128
+  backbone: resnet18
+  num_classes: 1
+
+fusion:
+  fusion_dim: 128
+  dropout: 0.3
+
+baseline:
+  ml: logistic_regression
+  physics: mah_distance

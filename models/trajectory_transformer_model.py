@@ -37,13 +37,20 @@ class TrajectoryTransformerModel(nn.Module):
         )
 
         # Output head
-        self.fc = nn.Sequential(
+        self.output_head = nn.Sequential(
             nn.Linear(d_model, 64),
             nn.ReLU(),
             nn.Dropout(0.2),
             nn.Linear(64, 1),
             nn.Sigmoid()
         )
+
+    def encode(self, x):
+        """Encode trajectory sequence into a latent feature vector."""
+        x = self.input_proj(x)
+        x = x + self.positional_encoding[:, :x.size(1), :]
+        x = self.transformer(x)
+        return x[:, -1, :]
 
     def forward(self, x):
         """
@@ -62,4 +69,4 @@ class TrajectoryTransformerModel(nn.Module):
         # Take last timestep
         x = x[:, -1, :]
 
-        return self.fc(x)
+        return self.output_head(x)

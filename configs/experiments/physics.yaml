@@ -1,0 +1,5 @@
+experiment:
+  name: physics_baseline
+  description: Run physics-based collision risk estimators using orbital dynamics.
+  method: mah_distance
+  thresholds: [100, 200, 500]

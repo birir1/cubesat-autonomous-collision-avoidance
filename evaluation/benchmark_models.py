@@ -5,8 +5,8 @@ import torch
 import numpy as np
 from tqdm import trange
 
-from phases.phase6_maneuver_planning_rl.environment.orbital_env import OrbitalCollisionEnv
-from phases.phase6_maneuver_planning_rl.models.maddpg_agent import MADDPG
+from phases.phase6_maneuver_rl.environment.orbital_env import OrbitalCollisionEnv
+from phases.phase6_maneuver_rl.agents.maddpg import MADDPG
 
 
 def benchmark_maddpg(model_type='standard', episodes=50):
@@ -17,7 +17,6 @@ def benchmark_maddpg(model_type='standard', episodes=50):
         num_agents=3,
         state_dim=24,
         action_dim=2,
-        model_type=model_type,
         device=torch.device('cpu')
     )
 

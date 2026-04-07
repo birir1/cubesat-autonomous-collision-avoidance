@@ -1,1 +1,30 @@
 # rl_config.yaml
+rl:
+  algorithm: "PPO"   # options: PPO, DQN, SAC
+
+  environment:
+    state_dim: 6
+    action_dim: 3
+
+  reward:
+    collision_penalty: -100.0
+    safe_distance_reward: 1.0
+    fuel_penalty: -0.01
+
+  training:
+    episodes: 1000
+    max_steps_per_episode: 500
+
+    gamma: 0.99
+    lambda: 0.95
+
+    clip_epsilon: 0.2
+    entropy_coef: 0.01
+
+    learning_rate: 0.0003
+
+  exploration:
+    strategy: "stochastic"
+    noise_std: 0.1
+
+  model_save_path: "models/rl_agent.pth"

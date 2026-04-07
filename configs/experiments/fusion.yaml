@@ -1,0 +1,12 @@
+experiment:
+  name: multimodal_fusion
+  description: Compare trajectory, vision, and graph fusion strategies.
+  fusion_strategies:
+    - early
+    - late
+    - hybrid
+  metrics:
+    - auc
+    - precision
+    - recall
+    - ece

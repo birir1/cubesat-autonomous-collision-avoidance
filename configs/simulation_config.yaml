@@ -1,1 +1,29 @@
 # simulation_config.yaml
+simulation:
+  physics:
+    mu_earth: 398600.4418   # km^3/s^2
+
+  time:
+    dt: 1.0                # seconds
+    total_time: 1000       # seconds
+
+  orbit:
+    altitude_km: 700
+    inclination_deg: 98.0
+
+  initial_conditions:
+    satellite_1:
+      position_km: [7000, 0, 0]
+      velocity_kms: [0, 7.5, 0]
+
+    satellite_2:
+      position_km: [7005, 0, 0]
+      velocity_kms: [0, 7.4, 0]
+
+  perturbations:
+    enable_j2: false
+    atmospheric_drag: false
+
+  output:
+    save_trajectories: true
+    save_path: "data/simulation/"

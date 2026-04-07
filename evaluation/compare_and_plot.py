@@ -11,7 +11,7 @@ from utils.tle_loader import load_all_satellites
 from data.features.trajectory_dataset import build_trajectory_dataset
 
 from models.trajectory_risk_model import TrajectoryRiskModel
-from models.collision_risk_model import CollisionRiskModel
+from models.static_collision_risk_model import StaticCollisionRiskModel
 
 
 # ===============================
@@ -38,7 +38,7 @@ def load_trajectory_model(device):
 
 
 def load_static_model(device):
-    model = CollisionRiskModel().to(device)
+    model = StaticCollisionRiskModel().to(device)
 
     try:
         state_dict = torch.load(

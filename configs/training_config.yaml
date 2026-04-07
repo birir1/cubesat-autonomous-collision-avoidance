@@ -1,1 +1,32 @@
 # training_config.yaml
+training:
+  device: "cuda"   # or "cpu"
+
+  epochs: 50
+  learning_rate: 0.001
+  weight_decay: 0.0001
+
+  optimizer: "adam"   # options: adam, sgd
+  scheduler:
+    type: "step"
+    step_size: 10
+    gamma: 0.5
+
+  loss:
+    type: "binary_cross_entropy"
+
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1_score
+    - roc_auc
+
+  checkpoint:
+    save_dir: "checkpoints/"
+    save_best_only: true
+    monitor: "val_loss"
+
+  logging:
+    use_wandb: true
+    project_name: "cubesat_collision_avoidance"

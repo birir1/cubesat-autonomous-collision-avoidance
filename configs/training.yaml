@@ -1,0 +1,37 @@
+seed: 42
+use_wandb: false
+data_dir: data/synthetic
+num_samples: 2000
+sequence_length: 20
+num_satellites: 10
+batch_size: 32
+num_workers: 2
+learning_rate: 0.001
+num_epochs: 12
+dropout: 0.2
+fusion_dim: 128
+patience: 10
+checkpoint_dir: results/checkpoints
+
+trajectory_config:
+  input_dim: 6
+  d_model: 128
+  nhead: 4
+  num_layers: 2
+  dim_feedforward: 256
+  dropout: 0.2
+
+gnn_config:
+  node_dim: 6
+  edge_dim: 3
+
+  hidden_dim: 64
+  output_dim: 32
+  num_layers: 2
+  gnn_type: gcn
+  dropout: 0.1
+
+vision_config:
+  feature_dim: 512
+  num_classes: 1
+  pretrained: true

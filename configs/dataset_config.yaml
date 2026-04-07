@@ -1,1 +1,29 @@
 # dataset_config.yaml
+dataset:
+  name: "synthetic_orbital_collision_dataset"
+  save_path: "data/dataset.npz"
+
+  generation:
+    num_samples: 50000
+    collision_threshold: 0.1
+
+    position_range_km: [-10, 10]
+    velocity_range_kms: [-1, 1]
+
+  features:
+    input_dim: 6
+    feature_names: ["rx", "ry", "rz", "vx", "vy", "vz"]
+
+  split:
+    train_ratio: 0.7
+    val_ratio: 0.15
+    test_ratio: 0.15
+
+  preprocessing:
+    normalize: true
+    normalization_type: "standard"   # options: standard, minmax
+
+  loader:
+    batch_size: 128
+    shuffle: true
+    num_workers: 4

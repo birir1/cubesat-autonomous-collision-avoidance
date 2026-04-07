@@ -271,3 +271,18 @@ def escape_velocity(radius: float, mu: float = MU_EARTH) -> float:
 def circular_orbit_velocity(radius: float, mu: float = MU_EARTH) -> float:
     """Velocity required for circular orbit."""
     return np.sqrt(mu / radius)
+
+
+def compute_orbital_period(radius: float, mu: float = MU_EARTH) -> float:
+    """Compute orbital period for a circular orbit."""
+    return 2 * np.pi * np.sqrt(radius**3 / mu)
+
+
+def hohmann_transfer_delta_v(r1: float, r2: float, mu: float = MU_EARTH) -> Tuple[float, float]:
+    """Compute delta-v required for a Hohmann transfer between two circular orbits."""
+    v1 = np.sqrt(mu / r1)
+    v2 = np.sqrt(mu / r2)
+    a_transfer = 0.5 * (r1 + r2)
+    v_perigee = np.sqrt(mu * (2 / r1 - 1 / a_transfer))
+    v_apogee = np.sqrt(mu * (2 / r2 - 1 / a_transfer))
+    return float(abs(v_perigee - v1)), float(abs(v2 - v_apogee))

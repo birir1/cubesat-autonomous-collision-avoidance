@@ -1,0 +1,59 @@
+# Multimodal Collision Risk Predictor Configuration
+
+# Random seed for reproducibility
+seed: 42
+
+# Data configuration
+data_dir: "data/synthetic_multimodal"
+num_samples: 100  # Small for testing
+sequence_length: 20
+num_satellites: 10
+
+# Training configuration
+num_epochs: 1  # Just one epoch for testing
+batch_size: 32
+learning_rate: 0.001
+patience: 10
+num_workers: 4
+device: "cuda"  # or "cpu"
+
+# Model configuration
+fusion_dim: 256
+dropout: 0.1
+
+# Trajectory model config
+trajectory_config:
+  input_dim: 6
+  d_model: 64
+  nhead: 4
+  num_layers: 2
+  dim_feedforward: 128
+  dropout: 0.1
+
+# GNN model config
+gnn_config:
+  node_dim: 6
+  edge_dim: 3
+  hidden_dim: 64
+  output_dim: 32
+  num_layers: 3
+  gnn_type: "gcn"  # "gcn", "gat", "sage"
+  dropout: 0.1
+
+# Vision model config
+vision_config:
+  feature_dim: 512
+  num_classes: 1
+  pretrained: true
+
+# Checkpoint and logging
+checkpoint_dir: "results/models/multimodal"
+use_wandb: false
+wandb_project: "cubesat-collision-prediction"
+
+# Evaluation configuration
+evaluation_metrics:
+  - "auc"
+  - "precision_recall_auc"
+  - "collision_detection_rate"
+  - "false_alarm_rate"

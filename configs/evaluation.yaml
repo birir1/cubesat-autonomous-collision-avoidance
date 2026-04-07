@@ -1,0 +1,6 @@
+evaluation:
+  batch_size: 32
+  num_workers: 2
+  thresholds: [0.1, 0.2, 0.3, 0.4, 0.5]
+  output_dir: results/evaluation
+  roc_plot: true

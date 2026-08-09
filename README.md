@@ -141,17 +141,6 @@ Benchmark against established methods (Gaussian Pc, Mahalanobis distance, Kalman
 
 ## Citation
 
-If you use this work in your research, please cite:
-
-```bibtex
-@article{birir2026multimodal,
-  title={Multimodal Learning Framework for CubeSat Collision Risk Prediction},
-  author={Birir, [Your Name]},
-  journal={arXiv preprint},
-  year={2026}
-}
-```
-
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
@@ -162,4 +151,4 @@ Contributions are welcome! Please read the contributing guidelines and submit pu
 
 ## Contact
 
-For questions or collaboration opportunities, please contact [your.email@example.com].
+For questions or collaboration opportunities, please contact sospeterbirir1@gmail.com.
